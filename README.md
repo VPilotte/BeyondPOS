@@ -16,7 +16,7 @@ GK TLog mapping is done with XSLT. There are 2 files imported in mapping
 
 Make sure that proper version of GK's TLog version is used in the main XSLT stylesheet file. Here's an example of using version 2.2:
 
-```sh
+```xml
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:SES="http://www.gk-software.com/storeweaver/sdc/pos_upload/ses_pos_upload/2.2"
 xmlns:datatype="http://www.gk-software.com/storeweaver/sdc/pos_upload/ixr_datatypes/2.2"
@@ -26,26 +26,22 @@ version="2.0"
 extension-element-prefixes="ns0 SES">
 ```
 
+Content of XSLT mapping should be reviewed with functional team - there are very high chances that content will need to be updated depending on business needs.
+
 RFC used on CAR's side is a standard function module : 
-```sh
+```abap
 /POSDW/CREATE_TRANSACTIONS_EXT 
 ```
 
 If you ever need to do some logic on CAR's side, the RFC can be copied into a custom one. Changes will need to be done in PO but also in the XSLT. 
-```sh
+```xml
 <ns1:_-POSDW_-CREATE_TRANSACTIONS_EXT xmlns:ns1="urn:sap-com:document:sap:rfc:functions">
 ```
 Target RFC would need to be changed for the custom one you created, example : 
-```sh
+```xml
 <ns1:_ZCREATE_TRANSACTIONS_EXT xmlns:ns1="urn:sap-com:document:sap:rfc:functions">
 ```
 
-* [] - HTML enhanced for web apps!
-* [Ace Editor] - awesome web-based text editor
-
-
-And of course Dillinger itself is open source with a [public repository][dill]
- on GitHub.
 
 ### Documentation for Master Data replication
 
@@ -55,20 +51,18 @@ Master Data replication to GK can be done two ways, depending on the complexity 
 
 For most projects, Standard IDocs will be used. Complexity needs to be evaluated prior to evaluation and setting those up, as using GK's internal structure requires mapping and takes a lot more time to setup.
 
-Install the dependencies and devDependencies and start the server.
+All IDocs are going to the same url on GK's side @ **http:port**/swee-ucon/tenants/100/sappi/import/
 
-```sh
-$ cd dillinger
-$ npm install -d
-$ node app
-```
+| IDoc | Direction | Description | 
+| CREMAS.CREMAS05 | Outbound | Vendor master data distribution |
+| DEBMAS.DEBMAS07 | Outbound | Customer master data distribution |
+| WBBDLD.WBBDLD05 | Outbound | HPR Assortment List: Material Data with Article Hierarchy |
+| WPDWGR.WPDWGR01 | Outbound | POS interface: Download material group master |
+| STATUS.SYSTAT01 | Inbound | CA-EDI: Transfer from status records |
 
-For production environments...
+Status IDoc is used by GK to send confirmation when receiving Inbound IDocs. It needs to be setup in WE20 on S/4 side with these values
 
-```sh
-$ npm install --production
-$ NODE_ENV=production node app
-```
+
 
 ### Documentation to setup SOAP Web Services used by GK
 
@@ -76,19 +70,22 @@ On the S/4HANA side, [SOAP] Web Services need to be activated. This is done thro
 SOAP Runtime needs to be properly configured prio to testing those services. Transaction SRT_UTIL can be used to check on the configuration. 
 If this isn't done, Basis resources needs to do the setup.
 
-| Web Service | Endpoint |
-| ------ | ------ |
-| Dropbox | [plugins/dropbox/README.md][PlDb] |
-| Github | [plugins/github/README.md][PlGh] |
-| Google Drive | [plugins/googledrive/README.md][PlGd] |
-| OneDrive | [plugins/onedrive/README.md][PlOd] |
-| Medium | [plugins/medium/README.md][PlMe] |
-| Google Analytics | [plugins/googleanalytics/README.md][PlGa] |
+In SOAMANAGER, **Simplified Web Service Configuration** will be used for creating endpoints. A used for GK needs to be created in S/4 in order to be able to call the web services.
+
+
+| External Name| Internal Name | Endpoint (HTTP/HTTPS) |
+| ------ | ------ | ------ |
+| InventoryByLocationAndMaterialQueryResponse_In | 	ECC_INVENTORY002QR |**host:port**/sap/bc/srt/scs/sap/ecc_inventory002qr |
+| Github | [plugins/github/README.md] |
+| Google Drive | [plugins/googledrive/README.md] |
+| OneDrive | [plugins/onedrive/README.md] |
+| Medium | [plugins/medium/README.md] |
+| Google Analytics | [plugins/googleanalytics/README.md] |
 
 
 ### Todos
 
- - This will be the list of todos
+ - [ ] Extract and describe all content of XSLT
 
 License
 ----
